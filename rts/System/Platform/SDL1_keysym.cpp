@@ -9,6 +9,9 @@
 static const spring::unordered_bimap<int, int> SDL_keysym_bimap = {
 	{SDLK_UNKNOWN, 0},
 
+	{SPRING_KEY_WHEELUP, SPRING_KEY_WHEELUP},
+	{SPRING_KEY_WHEELDOWN, SPRING_KEY_WHEELDOWN},
+
 	{SDLK_RETURN, 13},
 	{SDLK_ESCAPE, 27},
 	{SDLK_BACKSPACE, 8},

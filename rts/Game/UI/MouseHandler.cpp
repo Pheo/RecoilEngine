@@ -658,6 +658,10 @@ void CMouseHandler::MouseWheel(float delta)
 		return;
 	}
 
+	auto activeControllerReceiver = (activeController == nullptr) ? nullptr : activeController->GetInputReceiver();
+	if (activeControllerReceiver && activeControllerReceiver->MouseWheel(delta))
+		return;
+
 	camHandler->GetCurrentController().MouseWheelMove(delta * scrollWheelSpeed);
 }
 

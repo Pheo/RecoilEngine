@@ -120,6 +120,58 @@ void CGameInputReceiver::MouseRelease(int x, int y, int button)
 	return;
 }
 
+bool CGameInputReceiver::MouseWheel(float delta)
+{
+	if (delta == 0.0f)
+		return false;
+
+	const bool up = delta > 0.0f;
+	const int keyCode = CKeyCodes::GetMouseWheelSymbol(up);
+	const int scanCode = CScanCodes::GetMouseWheelSymbol(up);
+	const CKeySet kc(keyCode, CKeySet::KSKeyCode);
+	const CKeySet ks(scanCode, CKeySet::KSScanCode);
+
+	const auto now = spring_gettime();
+	curKeyCodeChain.push_back(kc, now, false);
+	curScanCodeChain.push_back(ks, now, false);
+	lastActionList = keyBindings.GetActionList(curKeyCodeChain, curScanCodeChain);
+
+	if (lastActionList.empty())
+		return false;
+
+	const ActionList pressedActions = lastActionList;
+	bool handled = luaInputReceiver->KeyPressed(keyCode, scanCode, false);
+
+	if (!handled) {
+		for (CInputReceiver* recv: CInputReceiver::GetReceivers()) {
+			if (recv != nullptr && recv->KeyPressed(keyCode, scanCode, false)) {
+				handled = true;
+				break;
+			}
+		}
+	}
+
+	if (!handled)
+		handled = TryOnPressActions(false);
+
+	// Wheel events are pulses; release the captured actions without another binding lookup.
+	lastActionList = pressedActions;
+	if (luaInputReceiver->KeyReleased(keyCode, scanCode))
+		return true;
+
+	for (CInputReceiver* recv: CInputReceiver::GetReceivers()) {
+		if (recv != nullptr && recv->KeyReleased(keyCode, scanCode))
+			return true;
+	}
+
+	for (const Action& action: pressedActions) {
+		if (game->ActionReleased(action))
+			return true;
+	}
+
+	return handled;
+}
+
 bool CGameInputReceiver::TryOnPressActions(bool isRepeat)
 {
 	// try our list of actions

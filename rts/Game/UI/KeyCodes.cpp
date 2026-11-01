@@ -170,6 +170,8 @@ void CKeyCodes::Reset()
 	for (int i = ACTION_BUTTON_MIN; i <= NUM_BUTTONS; i++) {
 		AddPair("mouse" + IntToString(i), CKeyCodes::GetMouseButtonSymbol(i));
 	}
+	AddPair("wheelup", CKeyCodes::GetMouseWheelSymbol(true));
+	AddPair("wheeldown", CKeyCodes::GetMouseWheelSymbol(false));
 
 	std::sort(nameToCode.begin(), nameToCode.end(), namePred);
 	std::sort(codeToName.begin(), codeToName.end(), codePred);
@@ -195,6 +197,11 @@ int CKeyCodes::GetMouseButtonSymbol(int button)
 	// magic number here chosen so it won't conflict with SDL or unicode reserved values.
 	// choosing a private part of unicode range.
 	return 0xE000+button;
+}
+
+int CKeyCodes::GetMouseWheelSymbol(bool up)
+{
+	return up ? SPRING_KEY_WHEELUP : SPRING_KEY_WHEELDOWN;
 }
 
 
