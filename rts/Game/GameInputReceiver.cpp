@@ -101,6 +101,12 @@ bool CGameInputReceiver::MousePress(int x, int y, int button)
 
 	lastActionList = keyBindings.GetActionList(curKeyCodeChain, curScanCodeChain);
 
+	// Dispatch mouse-bound actions through the same receivers as keyboard bindings.
+	for (CInputReceiver* recv: CInputReceiver::GetReceivers()) {
+		if (recv != nullptr && recv->KeyPressed(keyCode, scanCode, isRepeat))
+			return true;
+	}
+
 	return TryOnPressActions(isRepeat);
 }
 

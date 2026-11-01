@@ -518,9 +518,12 @@ bool RmlGui::ProcessKeyPressed(int keyCode, int scanCode, bool isRepeat)
 	if (!RmlInitialized()) {
 		return false;
 	}
+	const auto kc = RmlSDLRecoil::ConvertKey(keyCode);
+	if (kc == Rml::Input::KI_UNKNOWN) {
+		return false;
+	}
 	bool result = false;
 	for (const auto& context : state->contexts) {
-		auto kc = RmlSDLRecoil::ConvertKey(keyCode);
 		result |= !RmlSDLRecoil::EventKeyDown(context, kc);
 		if (result) break;
 	}
